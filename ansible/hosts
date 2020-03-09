@@ -1,0 +1,9 @@
+[all]
+tb-h1		ansible_user=admin ansible_ssh_private_key_file=../keys/id_rsa #ansible_become_password=a1d3m7
+tb-h2		ansible_user=admin ansible_ssh_private_key_file=../keys/id_rsa #ansible_become_password=a1d3m7
+
+[controllers]
+tb-h1
+
+[computes]
+tb-h2
