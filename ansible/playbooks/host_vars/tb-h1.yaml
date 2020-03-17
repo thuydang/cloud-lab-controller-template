@@ -1,0 +1,19 @@
+#ethernet vars
+allIfaces: 
+nmcli_ethernet:
+  - conn_name: em1
+    ifname: em1
+    ip4: '{{ tenant_ip }}'
+    gw4: '{{ tenant_gw }}'
+  - conn_name: em2
+    ifname: em2
+    ip4: '{{ tenant_ip1 }}'
+    gw4: '{{ tenant_gw }}'
+  - conn_name: p2p1
+    ifname: p2p1
+    ip4: '{{ storage_ip }}'
+    gw4: '{{ storage_gw }}'
+  - conn_name: p2p2
+    ifname: p2p2
+    ip4: '{{ external_ip }}'
+    gw4: '{{ external_gw }}'

@@ -1,0 +1,39 @@
+## os-all group_vars
+'''yaml
+---
+# OpenStack networks
+os_management: 
+  cidr: "172.29.236.0/22"
+  vlan: 10
+os_overlay: # OpenStack Networking
+  cidr: "172.29.240.0/22"
+  vlan: 30
+os_storage: 
+  cidr: "172.29.244.0/22"
+  vlan: 20
+
+#bond vars
+nmcli_bond:
+  - conn_name: bond0
+    ip4: ''
+    gw4: ''
+    mode: balance-alb
+#  - conn_name: bond1
+#    ip4: '{{ external_ip }}'
+#    gw4: ''
+#    mode: balance-alb
+nmcli_bond_slave:
+  - conn_name: em1
+    ifname: em1
+    master: tenant
+  - conn_name: em2
+    ifname: em2
+    master: tenant
+  - conn_name: p2p1
+    ifname: p2p1
+    master: storage
+  - conn_name: p2p2
+    ifname: p2p2
+    master: external
+
+

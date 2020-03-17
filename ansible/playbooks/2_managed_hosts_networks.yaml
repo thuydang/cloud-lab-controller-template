@@ -1,0 +1,44 @@
+---
+- hosts: os-all
+  become: true
+  tasks:
+    - name: install network manager packages 
+      package:
+        name: 
+          - NetworkManager-glib
+          - nm-connection-editor
+          - libsemanage-python
+          - policycoreutils-python
+###### Working with all cloud nodes - Bonding
+    - name: Try nmcli add bond - conn_name only & ip4 gw4 mode
+      nmcli:
+        type: bond
+        conn_name: '{{ item.conn_name }}'
+        ip4: '{{ item.ip4 }}'
+        gw4: '{{ item.gw4 }}'
+        mode: '{{ item.mode }}'
+        state: present
+      with_items:
+        - '{{ nmcli_bond }}'
+  
+    - name: Try nmcli add bond-slave
+      nmcli:
+        type: bond-slave
+        conn_name: '{{ item.conn_name }}'
+        ifname: '{{ item.ifname }}'
+        master: '{{ item.master }}'
+        state: present
+      with_items:
+        - '{{ nmcli_bond_slave }}'
+  
+  ##### Working with all cloud nodes - Ethernet
+    - name: Try nmcli add Ethernet - conn_name only & ip4 gw4
+      nmcli:
+        type: ethernet
+        conn_name: '{{ item.conn_name }}'
+        ip4: '{{ item.ip4 }}'
+        gw4: '{{ item.gw4 }}'
+        state: present
+      with_items:
+        - '{{ nmcli_ethernet }}'
+  

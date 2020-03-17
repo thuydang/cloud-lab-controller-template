@@ -1,9 +1,12 @@
-[all]
+[ansible-controller]
+localhost   ansible_connection=local
+
+[os-all]
 tb-h1		ansible_user=admin ansible_ssh_private_key_file=../keys/id_rsa #ansible_become_password=a1d3m7
 tb-h2		ansible_user=admin ansible_ssh_private_key_file=../keys/id_rsa #ansible_become_password=a1d3m7
 
-[controllers]
-tb-h1
-
-[computes]
+[os-controllers]
 tb-h2
+
+[os-computes]
+tb-h1
