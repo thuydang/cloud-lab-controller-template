@@ -1,2 +1,14 @@
 ---
-
+- name: debug playbook
+  hosts: os-all
+  tasks:
+  - name: Show tmp variables
+    debug:
+      msg: "{{ ansible_facts | dict2items }}"
+      #  - name: Show interfaces details
+      #    debug:
+      #      msg: "{{ lookup('vars', 'ansible_' + item) }}"
+      #    loop: "{{ ansible_interfaces }}"
+  - name: Get network interfaces.
+    debug:
+      msg: "{{ ansible_facts | dict2items | selectattr('value.ipv4', 'defined') | map(attribute='value') | list | selectattr('type', 'equalto', ether) | list }}"

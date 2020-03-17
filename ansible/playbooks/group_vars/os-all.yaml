@@ -1,5 +1,4 @@
 ## os-all group_vars
-'''yaml
 ---
 # OpenStack networks
 os_management: 
