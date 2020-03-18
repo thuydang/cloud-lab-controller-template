@@ -1,0 +1,32 @@
+From 831f2366e8171b0e7d5ef51047c2006b3e8d5a25 Mon Sep 17 00:00:00 2001
+From: Sinan Polat <sinan@turka.nl>
+Date: Thu, 18 Jul 2019 13:07:07 +0200
+Subject: [PATCH] Fixed modifying bond and team slaves
+
+Fixed modifying bond and team slaves by adding required option connection.slave-type
+---
+ lib/ansible/modules/net_tools/nmcli.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/ansible/modules/net_tools/nmcli.py b/lib/ansible/modules/net_tools/nmcli.py
+index 538e66fdd4e1b..c6feca5b8a91c 100644
+--- a/lib/ansible/modules/net_tools/nmcli.py
++++ b/lib/ansible/modules/net_tools/nmcli.py
+@@ -856,7 +856,7 @@ def create_connection_team_slave(self):
+         return cmd
+ 
+     def modify_connection_team_slave(self):
+-        cmd = [self.nmcli_bin, 'con', 'mod', self.conn_name, 'connection.master', self.master]
++        cmd = [self.nmcli_bin, 'con', 'mod', self.conn_name, 'connection.slave-type', 'team', 'connection.master', self.master]
+         # format for modifying team-slave interface
+         if self.mtu is not None:
+             cmd.append('802-3-ethernet.mtu')
+@@ -944,7 +944,7 @@ def create_connection_bond_slave(self):
+         return cmd
+ 
+     def modify_connection_bond_slave(self):
+-        cmd = [self.nmcli_bin, 'con', 'mod', self.conn_name, 'connection.master', self.master]
++        cmd = [self.nmcli_bin, 'con', 'mod', self.conn_name, 'connection.slave-type', 'bond', 'connection.master', self.master]
+         # format for modifying bond-slave interface
+         return cmd
+ 

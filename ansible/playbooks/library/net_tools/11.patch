@@ -1,0 +1,55 @@
+From da2c24fa32905cee9a65507bed3a7a38d52d499b Mon Sep 17 00:00:00 2001
+From: Susant Sahani <ssahani@gmail.com>
+Date: Mon, 19 Nov 2018 16:30:19 +0530
+Subject: [PATCH] nmcli: fix NetworkManager-glib package obsoleted
+
+Please see https://bugzilla.redhat.com/show_bug.cgi?id=1570875
+and https://developer.gnome.org/libnm/stable/usage.html
+
+Closes https://github.com/ansible/ansible/issues/48055
+
+Signed-off-by: Susant Sahani <susant@redhat.com>
+---
+ lib/ansible/modules/net_tools/nmcli.py | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/lib/ansible/modules/net_tools/nmcli.py b/lib/ansible/modules/net_tools/nmcli.py
+index 595f51e4c325c..19c35029ac9d9 100644
+--- a/lib/ansible/modules/net_tools/nmcli.py
++++ b/lib/ansible/modules/net_tools/nmcli.py
+@@ -20,11 +20,11 @@
+ module: nmcli
+ author: "Chris Long (@alcamie101)"
+ short_description: Manage Networking
+-requirements: [ nmcli, dbus, NetworkManager-glib ]
++requirements: [ nmcli, dbus, NetworkManager-libnm ]
+ version_added: "2.0"
+ description:
+     - Manage the network devices. Create, modify and manage various connection and device type e.g., ethernet, teams, bonds, vlans etc.
+-    - "On CentOS and Fedora like systems, install dependencies as 'yum/dnf install -y python-gobject NetworkManager-glib'"
++    - "On CentOS and Fedora like systems, install dependencies as 'yum/dnf install -y python-gobject NetworkManager-libnm'"
+     - "On Ubuntu and Debian like systems, install dependencies as 'apt-get install -y libnm-glib-dev'"
+ options:
+     state:
+@@ -318,7 +318,7 @@
+       name: '{{ item }}'
+       state: installed
+     with_items:
+-      - NetworkManager-glib
++      - NetworkManager-libnm
+       - libnm-qt-devel.x86_64
+       - nm-connection-editor.x86_64
+       - libsemanage-python
+@@ -501,10 +501,9 @@
+ 
+ try:
+     import gi
+-    gi.require_version('NMClient', '1.0')
+-    gi.require_version('NetworkManager', '1.0')
++    gi.require_version('NM', '1.0')
+ 
+-    from gi.repository import NetworkManager, NMClient
++    from gi.repository import NM
+     HAVE_NM_CLIENT = True
+ except (ImportError, ValueError):
+     HAVE_NM_CLIENT = False
