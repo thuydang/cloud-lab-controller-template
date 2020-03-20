@@ -5,10 +5,9 @@
     - name: install network manager packages 
       package:
         name: 
-          - NetworkManager-glib
+          - NetworkManager-libnm
           - nm-connection-editor
-          - libsemanage-python
-          - policycoreutils-python
+          - policycoreutils-python-utils
 ###### Working with all cloud nodes - Bonding
     - name: Try nmcli add bond - conn_name only & ip4 gw4 mode
       nmcli:
@@ -24,21 +23,79 @@
     - name: Try nmcli add bond-slave
       nmcli:
         type: bond-slave
-        conn_name: '{{ item.conn_name }}'
-        ifname: '{{ item.ifname }}'
-        master: '{{ item.master }}'
+        conn_name: '{{ item }}'
+        ifname: '{{ item }}'
+        master: '{{ os_bond.bond_name}}'
         state: present
       with_items:
-        - '{{ nmcli_bond_slave }}'
+        '{{ nmcli_bond_slave }}'
+##### Working with all cloud nodes - vlan
+#    - name: Setup vlan on bond device - not working. Ansible required ip4 set.
+#      nmcli:
+#        type: '{{ item.type }}'
+#        conn_name: '{{ item.conn_name }}'
+#        vlanid: '{{ item.vlanid }}'
+#        vlandev: '{{ item.vlandev }}'
+#        state: present
+#      with_items: '{{ nmcli_vlan }}'
+#      register: r
+#    - debug:
+#        msg: "{{ r }}"
+    - name: Setup vlan on bond device with template
+      template:
+        src: ./templates/bond_vlan.j2
+        dest: '/etc/sysconfig/network-scripts/ifcfg-{{item.conn_name}}'
+      with_items: '{{ nmcli_vlan }}'
+    - name: Bringing up bond vlan
+      shell: |
+        nmcli connection up '{{ item.conn_name }}'
+      with_items: '{{ nmcli_vlan }}'
+        
+####     # Working with all cloud nodes - bridge
+         #- set_fact:
+         #bridge_slave: "{{ ansible_interfaces | difference(['lo','br0']) | first }}"
+#         - name: setup bridge -- also not working. use template
+#           nmcli:
+#        type: '{{ item.type }}'
+#        conn_name: '{{ item.conn_name }}'
+#        ifname: '{{ item.conn_name }}'
+#        ip4: '{{ item.ip4 }}'
+#        state: present
+#      with_items: '{{ nmcli_bridge}}'
+    - name: Setup bridge with template
+      template:
+        src: ./templates/host_bridge.j2
+        dest: '/etc/sysconfig/network-scripts/ifcfg-{{item.conn_name}}'
+      with_items: '{{ nmcli_bridge }}'
   
-  ##### Working with all cloud nodes - Ethernet
-    - name: Try nmcli add Ethernet - conn_name only & ip4 gw4
-      nmcli:
-        type: ethernet
-        conn_name: '{{ item.conn_name }}'
-        ip4: '{{ item.ip4 }}'
-        gw4: '{{ item.gw4 }}'
-        state: present
-      with_items:
-        - '{{ nmcli_ethernet }}'
-  
+#    - name: setup bridge slave - also not working use shell
+#      nmcli:
+#        type: '{{ item.type }}'
+#        conn_name: '{{ item.conn_name }}'
+#        ifname: '{{ item.conn_name }}'
+#        state: present
+#        autoconnect: yes
+#        master: '{{ item.master }}'
+#      with_items: '{{ nmcli_bridge_slave }}'
+    - name: quickly add available vlan to bridge
+      shell: |
+        #nmcli con add type bridge-slave ifname '{{ item.conn_name }}' master '{{ item.master }}'
+        nmcli con modify '{{ item.conn_name }}' master '{{ item.master }}' slave-type bridge 
+      with_items: '{{ nmcli_bridge_slave }}'
+    - name: Bringing up bridges
+      shell: |
+        nmcli connection up '{{ item.conn_name }}'
+      with_items: '{{ nmcli_bridge }}'
+     
+    - name: restart NetworkManager 
+      service: 
+        name: NetworkManager 
+        state: restarted 
+
+#     - name: Restart network service for bridge interface
+#       service:
+#         name: network
+#         state: restarted
+#         args: '{{ item.conn_name }}'
+#       with_items: '{{ nmcli_bridge }}'
+ 

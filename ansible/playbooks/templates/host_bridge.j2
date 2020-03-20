@@ -1,0 +1,18 @@
+STP=yes
+BRIDGING_OPTS=priority=32768
+TYPE=Bridge
+PROXY_METHOD=none
+BROWSER_ONLY=no
+BOOTPROTO=none
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_FAILURE_FATAL=no
+IPV6_ADDR_GEN_MODE=stable-privacy
+NAME='{{ item.conn_name }}'
+DEVICE='{{ item.conn_name }}'
+ONBOOT=yes
+IPADDR='{{ item.ip4 | ipaddr('address')}}'
+NETMASK='{{ item.ip4 | ipaddr('netmask')}}'

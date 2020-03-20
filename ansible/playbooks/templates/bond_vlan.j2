@@ -1,0 +1,14 @@
+LAN=yes
+TYPE=Vlan
+PHYSDEV='{{ item.vlandev }}'
+VLAN_ID='{{ item.vlanid }}'
+REORDER_HDR=yes
+GVRP=no
+MVRP=no
+HWADDR=
+PROXY_METHOD=none
+BROWSER_ONLY=no
+BOOTPROTO=none
+NAME='{{ item.conn_name }}'
+DEVICE='{{ item.conn_name }}'
+ONBOOT=yes

@@ -2,37 +2,58 @@
 ---
 # OpenStack networks
 os_management: 
+  br_name: br-mgmt
   cidr: "172.29.236.0/22"
   vlan: 10
 os_overlay: # OpenStack Networking
+  br_name: br-vxlan
   cidr: "172.29.240.0/22"
   vlan: 30
 os_storage: 
+  br_name: br-storage
   cidr: "172.29.244.0/22"
   vlan: 20
 
-#bond vars
-nmcli_bond:
-  - conn_name: bond0
+# common bond vars
+os_bond: 
+  bond_name: bond0
+  mode: balance-tlb
+  #mode: balance-alb
+   
+
+# nmcli_bond_slave
+# host specific
+
+# vlan vars
+nmcli_vlan:
+  - conn_name: '{{ os_bond.bond_name }}.{{ os_management.vlan }}'
+    type: vlan
+    vlanid: '{{ os_management.vlan }}'
+    vlandev: '{{ os_bond.bond_name }}'
+    ipv4: ''
+  - conn_name: '{{ os_bond.bond_name }}.{{ os_overlay.vlan }}'
+    type: vlan
+    vlanid: '{{ os_overlay.vlan }}'
+    vlandev: '{{ os_bond.bond_name }}'
+    ipv4: ''
+  - conn_name: '{{ os_bond.bond_name }}.{{ os_storage.vlan }}'
+    type: vlan
+    vlanid: '{{ os_storage.vlan }}'
+    vlandev: '{{ os_bond.bond_name }}'
     ip4: ''
-    gw4: ''
-    mode: balance-alb
-#  - conn_name: bond1
-#    ip4: '{{ external_ip }}'
-#    gw4: ''
-#    mode: balance-alb
-nmcli_bond_slave:
-  - conn_name: em1
-    ifname: em1
-    master: tenant
-  - conn_name: em2
-    ifname: em2
-    master: tenant
-  - conn_name: p2p1
-    ifname: p2p1
-    master: storage
-  - conn_name: p2p2
-    ifname: p2p2
-    master: external
 
+# nmcli_bridge
+# host specific
 
+# bridge-slave vars
+nmcli_bridge_slave:
+  - conn_name: '{{ os_bond.bond_name }}.{{ os_management.vlan }}'
+    type: bridge-slave
+    master: '{{ os_management.br_name }}'
+  - conn_name: '{{ os_bond.bond_name }}.{{ os_overlay.vlan }}'
+    type: bridge-slave
+    master: '{{ os_overlay.br_name }}'
+  - conn_name: '{{ os_bond.bond_name }}.{{ os_storage.vlan }}'
+    type: bridge-slave
+    master: '{{ os_storage.br_name }}'
+ 
