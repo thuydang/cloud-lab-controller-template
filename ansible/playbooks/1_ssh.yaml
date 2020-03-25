@@ -17,11 +17,11 @@
 - hosts: os-all
   become: true
   tasks:
-    - name: make direcotry
+    - name: root - make direcotry
       file:
         path: "/root/.ssh"
         state: directory
-    - name: copy root keys
+    - name: root - copy root keys
       copy: 
         src: ../../util/ssh/{{ item }}
         dest: /root/.ssh/{{ item }}
@@ -30,9 +30,29 @@
       with_items:
         - id_rsa
         - id_rsa.pub
-    - name: set auth-keys.
+    - name: root - set auth-keys.
       authorized_key: # copy local pubkey to remote host.
         user: root
         key: "{{ lookup('file', item) }}"
         state: present
       with_fileglob: "/root/.ssh/*.pub"
+### admin user
+    - name: admin - make direcotry
+      file:
+        path: "/home/admin/.ssh"
+        state: directory
+    - name: root - copy root keys
+      copy: 
+        src: ../../util/ssh/{{ item }}
+        dest: /home/admin/.ssh/{{ item }}
+        owner: admin
+        mode: 0600
+      with_items:
+        - id_rsa
+        - id_rsa.pub
+    - name: root - set auth-keys.
+      authorized_key: # copy local pubkey to remote host.
+        user: admin
+        key: "{{ lookup('file', item) }}"
+        state: present
+      with_fileglob: "/home/admin/.ssh/*.pub"
