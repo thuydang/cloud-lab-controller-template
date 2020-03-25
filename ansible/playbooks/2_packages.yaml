@@ -1,0 +1,43 @@
+---
+- hosts: os-all
+  become: true
+  tasks:
+### Install packages
+    - name: install packages 
+      package:
+        name: 
+          - NetworkManager-libnm
+          - nm-connection-editor
+          - bridge-utils 
+          - net-tools
+          - iputils 
+          - lsof 
+          - lvm2 
+          - chrony 
+          - tcpdump 
+          - python
+          - vim
+          - python-virtualenv
+    - name: Add the 802.1q module
+      modprobe:
+        name: 8021q
+        state: present
+    - name: Add the bonding module
+      modprobe:
+        name: bonding
+        state: present
+    - name: Start service chronyd, if not started
+      service:
+        name: chronyd
+        state: started
+        enabled: yes
+    - name: Disable service NetworkManager
+      service:
+        name: NetworkManager
+        state: started
+        enabled: yes
+    - name: Disable service firewalld
+      service:
+        name: firewalld
+        state: stopped
+        enabled: no

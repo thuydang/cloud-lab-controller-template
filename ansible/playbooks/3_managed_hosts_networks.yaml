@@ -5,9 +5,9 @@
     - name: install network manager packages 
       package:
         name: 
-          - NetworkManager-libnm
+          #- NetworkManager-libnm
+          #- policycoreutils-python-utils
           - nm-connection-editor
-          - policycoreutils-python-utils
 ###### Working with all cloud nodes - Bonding
     - name: Try nmcli add bond - conn_name only & ip4 gw4 mode
       nmcli:
@@ -46,6 +46,14 @@
         src: ./templates/bond_vlan.j2
         dest: '/etc/sysconfig/network-scripts/ifcfg-{{item.conn_name}}'
       with_items: '{{ nmcli_vlan }}'
+    - name: Load bond vlan scritps
+      shell: | 
+        nmcli connection load '/etc/sysconfig/network-scripts/ifcfg-{{ item.conn_name }}'
+      with_items: '{{ nmcli_vlan }}'
+    - name: Set bond vlan managed by NM
+      shell: | 
+        nmcli device set '{{ item.conn_name }}' managed yes
+      with_items: '{{ nmcli_vlan }}'
     - name: Bringing up bond vlan
       shell: |
         nmcli connection up '{{ item.conn_name }}'
@@ -71,6 +79,10 @@
       shell: | 
         nmcli connection load '/etc/sysconfig/network-scripts/ifcfg-{{ item.conn_name }}'
       with_items: '{{ nmcli_bridge }}'
+    - name: Set bridge managed by NM
+      shell: | 
+        nmcli device set '{{ item.conn_name }}' managed yes
+      with_items: '{{ nmcli_bridge }}'
     - name: Bringing up bridges
       shell: |
         nmcli connection up '{{ item.conn_name }}'
@@ -91,7 +103,12 @@
         #nmcli con add type bridge-slave ifname '{{ item.conn_name }}' master '{{ item.master }}'
         nmcli con modify '{{ item.conn_name }}' master '{{ item.master }}' slave-type bridge 
       with_items: '{{ nmcli_bridge_slave }}'
+    - name: reactivate vlan after adding to bridge
+      shell: |
+        nmcli con up '{{ item.conn_name }}' 
+      with_items: '{{ nmcli_vlan }}'
     
+
     - name: restart NetworkManager 
       service: 
         name: NetworkManager 

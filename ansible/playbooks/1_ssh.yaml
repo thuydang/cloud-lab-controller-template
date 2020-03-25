@@ -35,13 +35,13 @@
         user: root
         key: "{{ lookup('file', item) }}"
         state: present
-      with_fileglob: "/root/.ssh/*.pub"
+      with_fileglob: "../../util/ssh/*.pub"
 ### admin user
     - name: admin - make direcotry
       file:
         path: "/home/admin/.ssh"
         state: directory
-    - name: root - copy root keys
+    - name: admin - copy keys
       copy: 
         src: ../../util/ssh/{{ item }}
         dest: /home/admin/.ssh/{{ item }}
@@ -50,9 +50,10 @@
       with_items:
         - id_rsa
         - id_rsa.pub
-    - name: root - set auth-keys.
+    - name: admin - set auth-keys.
       authorized_key: # copy local pubkey to remote host.
         user: admin
         key: "{{ lookup('file', item) }}"
         state: present
-      with_fileglob: "/home/admin/.ssh/*.pub"
+      with_fileglob: "../../util/ssh/*.pub"
+
