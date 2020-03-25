@@ -1,3 +1,4 @@
+# OpenStack Controller
 #ethernet vars
 allNetworkInterfaces: "{{ ansible_facts | dict2items | selectattr('value.ipv4', 'defined') | map(attribute='value') | list }}"
 allNetworkInterfaces_var2: "{{ ansible_facts.interfaces | map('extract', ansible_facts ) | list }}"
@@ -6,14 +7,14 @@ interfaceWithKnownIp_fromVar: "{{ allNetworkInterfaces | selectattr('ipv4.addres
 interfacesWithPartialKnowMac: "{{ allNetworkInterfaces | selectattr('macaddress', 'match', knownMacPrefix~'.*') | list }}"
 interfacesWitKnowType: "{{ allNetworkInterfaces | selectattr('type', 'equalto', 'ether') | sort(attribute='device') | list }}"
 
-ethernet_interfaces: "{{ ansible_facts | dict2items | map(attribute='value')
-| selectattr('type', 'defined')  
-| selectattr('type', 'equalto', 'ether')  
-| selectattr('module', 'defined')  
-| rejectattr('module', 'match', 'iwl.*') 
-| rejectattr('module', 'match', 'cdc.*') 
-| map(attribute='device')
-| list }}" 
+#ethernet_interfaces: "{{ ansible_facts | dict2items | map(attribute='value')
+#| selectattr('type', 'defined')  
+#| selectattr('type', 'equalto', 'ether')  
+#| selectattr('module', 'defined')  
+#| rejectattr('module', 'match', 'iwl.*') 
+#| rejectattr('module', 'match', 'cdc.*') 
+#| map(attribute='device')
+#| list }}" 
 # Convert KV dict ansible_facts to list of objects with K,V attributes, put all V in a list.
 # Filter the list for items with type defined. Without this type is evaluated even if not defined.
 # Filter the list for items with type = ether.
@@ -21,11 +22,13 @@ ethernet_interfaces: "{{ ansible_facts | dict2items | map(attribute='value')
 # Filter out item with module = cdc*. (wwan iface).
 # Create a list from attribute device.
 # Generate the final list.
+ethernet_interfaces: [enp0s25]
+external_interface: enp0s26u1u2
 
 #bond vars
 nmcli_bond:
   - conn_name: '{{ os_bond.bond_name }}'
-    ip4: '192.168.0.114'
+    ip4: '192.168.0.113'
     gw4: '192.168.0.1'
     mode: '{{ os_bond.mode }}'
 #  - conn_name: bond1
@@ -41,11 +44,13 @@ nmcli_bond_slave: '{{ ethernet_interfaces }}'
 nmcli_bridge:
   - conn_name: '{{ os_management.br_name }}'
     type: bridge
-    ip4: '172.29.236.3/22'
+    ip4: '172.29.236.2/22'
   - conn_name: '{{ os_overlay.br_name }}'
     type: bridge
-    ip4: '172.29.240.3/22'
+    ip4: '172.29.240.2/22'
   - conn_name: '{{ os_storage.br_name }}'
     type: bridge
-    ip4: '172.29.244.3/22'
-    
+    ip4: '172.29.244.2/22'
+  - conn_name: '{{ os_external.br_name }}'
+    type: bridge
+ 

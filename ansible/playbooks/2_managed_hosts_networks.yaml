@@ -67,7 +67,16 @@
         src: ./templates/host_bridge.j2
         dest: '/etc/sysconfig/network-scripts/ifcfg-{{item.conn_name}}'
       with_items: '{{ nmcli_bridge }}'
-  
+    - name: Load bridge scritps
+      shell: | 
+        nmcli connection load '/etc/sysconfig/network-scripts/ifcfg-{{ item.conn_name }}'
+      with_items: '{{ nmcli_bridge }}'
+    - name: Bringing up bridges
+      shell: |
+        nmcli connection up '{{ item.conn_name }}'
+      with_items: '{{ nmcli_bridge }}'
+     
+
 #    - name: setup bridge slave - also not working use shell
 #      nmcli:
 #        type: '{{ item.type }}'
@@ -82,11 +91,7 @@
         #nmcli con add type bridge-slave ifname '{{ item.conn_name }}' master '{{ item.master }}'
         nmcli con modify '{{ item.conn_name }}' master '{{ item.master }}' slave-type bridge 
       with_items: '{{ nmcli_bridge_slave }}'
-    - name: Bringing up bridges
-      shell: |
-        nmcli connection up '{{ item.conn_name }}'
-      with_items: '{{ nmcli_bridge }}'
-     
+    
     - name: restart NetworkManager 
       service: 
         name: NetworkManager 

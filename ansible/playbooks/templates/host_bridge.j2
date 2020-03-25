@@ -14,5 +14,7 @@ IPV6_ADDR_GEN_MODE=stable-privacy
 NAME='{{ item.conn_name }}'
 DEVICE='{{ item.conn_name }}'
 ONBOOT=yes
+{% if item.ip4 is defined and item.ip4 | length %}
 IPADDR='{{ item.ip4 | ipaddr('address')}}'
 NETMASK='{{ item.ip4 | ipaddr('netmask')}}'
+{% endif %}
