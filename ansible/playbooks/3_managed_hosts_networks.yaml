@@ -15,6 +15,7 @@
         conn_name: '{{ item.conn_name }}'
         ip4: '{{ item.ip4 }}'
         gw4: '{{ item.gw4 }}'
+        dns4: '{{ item.dns4 }}'
         mode: '{{ item.mode }}'
         state: present
       with_items:
@@ -23,7 +24,7 @@
     - name: Try nmcli add bond-slave
       nmcli:
         type: bond-slave
-        conn_name: '{{ item }}'
+        conn_name: 'bond-slave-{{ item }}'
         ifname: '{{ item }}'
         master: '{{ os_bond.bond_name}}'
         state: present
@@ -89,7 +90,7 @@
       with_items: '{{ nmcli_bridge }}'
      
 
-#    - name: setup bridge slave - also not working use shell
+#    - name: setup bridge slave - also not working, use shell
 #      nmcli:
 #        type: '{{ item.type }}'
 #        conn_name: '{{ item.conn_name }}'

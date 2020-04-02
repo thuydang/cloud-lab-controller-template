@@ -28,8 +28,10 @@ external_interface: enp0s26u1u2
 #bond vars
 nmcli_bond:
   - conn_name: '{{ os_bond.bond_name }}'
-    ip4: '192.168.0.113'
+    ip4: '192.168.0.113/24'
     gw4: '192.168.0.1'
+    dns4:
+      - 8.8.8.8
     mode: '{{ os_bond.mode }}'
 #  - conn_name: bond1
 #    ip4: '{{ external_ip }}'
@@ -53,4 +55,5 @@ nmcli_bridge:
     ip4: '172.29.244.2/22'
   - conn_name: '{{ os_external.br_name }}'
     type: bridge
+    ip4: '192.168.0.115/24'
  

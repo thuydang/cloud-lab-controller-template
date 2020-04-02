@@ -31,7 +31,7 @@
         name: chronyd
         state: started
         enabled: yes
-    - name: Disable service NetworkManager
+    - name: Enable service NetworkManager
       service:
         name: NetworkManager
         state: started
