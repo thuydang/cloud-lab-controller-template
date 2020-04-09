@@ -169,6 +169,10 @@ rabbitmq_use_ssl: false
 #
 # Uncomment this to disable keepalived installation (cf. documentation)
 #haproxy_use_keepalived: False
+
+# TD: have to set to True explicitly!
+haproxy_use_keepalived: True
+
 #
 keepalived_use_latest_stable: True
 #

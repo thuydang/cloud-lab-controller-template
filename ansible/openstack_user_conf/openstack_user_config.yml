@@ -74,22 +74,23 @@ global_overrides:
         type: "vxlan"
         range: "1:1000"
         net_name: "vxlan"
-    - network:
-        group_binds:
-          - neutron_linuxbridge_agent
-        container_bridge: "br-ex"
-        container_type: "veth"
-        container_interface: "eth11"
-        type: "vlan"
-        range: "101:200,301:400"
-        net_name: "vlan"
+        #- network:
+        #    group_binds:
+        #      - neutron_linuxbridge_agent
+        #    container_bridge: "br-ex"
+        #    container_type: "veth"
+        #    container_interface: "eth11"
+        #    type: "vlan"
+        #    range: "101:200,301:400"
+        #    net_name: "vlan"
     - network:
         group_binds:
           - neutron_linuxbridge_agent
         container_bridge: "br-ex"
         container_type: "veth"
         container_interface: "eth12"
-        host_bind_override: "eth12"
+        #host_bind_override: "eth12" # not exist, use br-ex
+        host_bind_override: "br-ex" # not exist, use br-ex. Duplicate so comment out previous provider vlan net.
         type: "flat"
         net_name: "flat"
 
@@ -126,9 +127,12 @@ storage_hosts:
     ip: 172.29.236.2
     container_vars:
       cinder_backends:
-        lvm:
-          volume_group: cinder-volumes
         limit_container_types: cinder_volume
+        lvm:
+          volume_driver: cinder.volume.drivers.lvm.LVMVolumeDriver
+          volume_group: cinder-volumes
+          volume_backend_name: LVM_iSCSI
+          iscsi_ip_address: "172.29.236.2"
 
 haproxy_hosts:
   infra1:
