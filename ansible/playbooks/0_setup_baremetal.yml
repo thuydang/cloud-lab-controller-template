@@ -1,0 +1,66 @@
+---
+- name: setup root key on ansible control host
+  hosts: ansible-controller
+  tasks:
+    - name: copy root keys locally.
+      become: true
+      copy: 
+        src: ../../util/ssh/{{ item }}
+        dest: /root/.ssh/{{ item }}
+        owner: root
+        mode: 0600
+      delegate_to: localhost
+      with_items:
+        - id_rsa
+        - id_rsa.pub
+
+- hosts: k8s-all
+  become: true
+  tasks:
+    - name: root - make direcotry
+      file:
+        path: "/root/.ssh"
+        state: directory
+    - name: root - copy root keys
+      copy: 
+        src: ../../util/ssh/{{ item }}
+        dest: /root/.ssh/{{ item }}
+        owner: root
+        mode: 0600
+      with_items:
+        - id_rsa
+        - id_rsa.pub
+    - name: root - set auth-keys.
+      authorized_key: # copy local pubkey to remote host.
+        user: root
+        key: "{{ lookup('file', item) }}"
+        state: present
+      with_fileglob: "../../util/ssh/*.pub"
+### admin user
+    - name: create user admin
+      user:
+        name: admin
+        groups: sudo
+        append: yes
+        system: yes
+        state: present
+    - name: admin - make ssh direcotry
+      file:
+        path: "/home/admin/.ssh"
+        state: directory
+    - name: admin - copy keys
+      copy: 
+        src: ../../util/ssh/{{ item }}
+        dest: /home/admin/.ssh/{{ item }}
+        owner: admin
+        mode: 0600
+      with_items:
+        - id_rsa
+        - id_rsa.pub
+    - name: admin - set auth-keys.
+      authorized_key: # copy local pubkey to remote host.
+        user: admin
+        key: "{{ lookup('file', item) }}"
+        state: present
+      with_fileglob: "../../util/ssh/*.pub"
+
