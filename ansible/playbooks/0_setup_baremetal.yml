@@ -63,4 +63,9 @@
         key: "{{ lookup('file', item) }}"
         state: present
       with_fileglob: "../../util/ssh/*.pub"
+    - name: sudo without password for wheel group
+      copy:
+        content: '%sudo ALL=(ALL:ALL) NOPASSWD:ALL'
+        dest: /etc/sudoers.d/wheel_nopasswd
+        mode: 0440
 
