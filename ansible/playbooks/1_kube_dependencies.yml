@@ -1,12 +1,6 @@
 - hosts: k8s-all
   become: yes
   tasks:
-   #- name: install Docker
-   #  apt:
-   #    name: docker.io
-   #    state: present
-   #    update_cache: true
-
    - name: disable swap, if any
      become: true
      shell: swapoff -a
